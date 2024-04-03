@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-namespace
 
 /**
- * JSON structural diff
+ * Options for json diff
  */
 export interface JsonDiffOptions {
   /**
@@ -23,6 +23,9 @@ export interface JsonDiffOptions {
   comparator?: JsonDiff.Comparator | undefined;
 }
 
+/**
+ * JSON structural diff
+ */
 export class JsonDiff {
   /**
    * The maximum depth to traverse.
@@ -96,22 +99,51 @@ export namespace JsonDiff {
    * Change info
    */
   export type Change = {
+    /**
+     * The depth of the change.
+     */
     depth: number;
+    /**
+     * new value
+     */
     value: unknown;
+    /**
+     * old value
+     */
     oldValue: unknown;
+    /**
+     * recursive path
+     */
     paths: (number | string)[];
+    /**
+     * `true` if added
+     */
     added: boolean;
+    /**
+     * `true` if changed
+     */
     changed: boolean;
+    /**
+     * `true` if removed
+     */
     removed: boolean;
   };
 
   /**
    * Change callback
+   *
+   * @param change - change info
+   * @returns `true` to stop
    */
   export type Callback = (change: Change) => void;
 
   /**
    * Comparator for custom equality checks.
+   *
+   * @param left - old value
+   * @param right - new value
+   * @param ignoreCase - `true` to ignore casing difference
+   * @returns `true` if equals
    */
   export type Comparator = (
     left: unknown,
@@ -119,8 +151,6 @@ export namespace JsonDiff {
     ignoreCase?: boolean | undefined
   ) => boolean;
 }
-
-export default JsonDiff;
 
 function equals(diff: JsonDiff, left: unknown, right: unknown): boolean {
   return diff.comparator(left, right, diff.ignoreCase);
