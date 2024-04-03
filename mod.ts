@@ -1,5 +1,8 @@
 // deno-lint-ignore-file no-namespace
 
+/**
+ * JSON structural diff
+ */
 export interface JsonDiffOptions {
   /**
    * The maximum depth to traverse.
@@ -45,6 +48,14 @@ export class JsonDiff {
     this.comparator = options.comparator || defaultComparator;
   }
 
+  /**
+   * Diff json
+   *
+   * @param left - old json
+   * @param right - new json
+   * @param callback - change callback
+   * @returns changes
+   */
   diff(
     left: unknown,
     right?: unknown,
@@ -57,11 +68,14 @@ export class JsonDiff {
     return changes;
   }
 
-  /** @internal */
-  equals(left: unknown, right: unknown): boolean {
-    return this.comparator(left, right, this.ignoreCase);
-  }
-
+  /**
+   * Diff json
+   *
+   * @param left - old json
+   * @param right - new json
+   * @param callback - change callback
+   * @returns changes
+   */
   static diff(
     left: unknown,
     right?: unknown,
@@ -78,6 +92,9 @@ export class JsonDiff {
 }
 
 export namespace JsonDiff {
+  /**
+   * Change info
+   */
   export type Change = {
     depth: number;
     value: unknown;
@@ -88,13 +105,25 @@ export namespace JsonDiff {
     removed: boolean;
   };
 
+  /**
+   * Change callback
+   */
   export type Callback = (change: Change) => void;
 
+  /**
+   * Comparator for custom equality checks.
+   */
   export type Comparator = (
     left: unknown,
     right: unknown,
     ignoreCase?: boolean | undefined
   ) => boolean;
+}
+
+export default JsonDiff;
+
+function equals(diff: JsonDiff, left: unknown, right: unknown): boolean {
+  return diff.comparator(left, right, diff.ignoreCase);
 }
 
 function difference(
@@ -179,7 +208,7 @@ function differenceValue(
   }
 
   // Changed
-  if (!diff.equals(left, right)) {
+  if (!equals(diff, left, right)) {
     change.value = right;
     change.oldValue = left;
     change.changed = true;
